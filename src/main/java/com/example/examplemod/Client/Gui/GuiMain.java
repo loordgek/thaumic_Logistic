@@ -1,0 +1,40 @@
+package com.example.examplemod.Client.Gui;
+
+import com.example.examplemod.thaumicLogisticMod;
+import net.minecraft.client.gui.inventory.GuiContainer;
+import net.minecraft.client.resources.I18n;
+import net.minecraft.inventory.Container;
+import net.minecraft.inventory.IInventory;
+import net.minecraft.util.ResourceLocation;
+
+/**
+ * Created by stefan on 28-4-2016.
+ */
+public abstract class GuiMain extends GuiContainer {
+
+    private final ResourceLocation guiTexture;
+    private final IInventory inventory;
+
+    public GuiMain(Container container, String guiTextureName, IInventory inventory) {
+        super(container);
+        guiTexture = new ResourceLocation(thaumicLogisticMod.MODID.toLowerCase() + ":textures/gui/" + guiTextureName + ".png");
+        this.inventory = inventory;
+    }
+
+    @Override
+    protected void drawGuiContainerBackgroundLayer(float partialTick, int mouseX, int mouseY) {
+        mc.getTextureManager().bindTexture(guiTexture);
+        drawTexturedModalRect(guiLeft, guiTop, 0, 0, xSize, ySize);
+    }
+
+    /**
+     * Draw the foreground layer for the GuiContainer (everything in front of the items)
+     */
+    @Override
+    protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
+        String s = inventory.hasCustomInventoryName() ? inventory.getInventoryName() : I18n.format(inventory.getInventoryName());
+        fontRendererObj.drawString(s, xSize / 2 - fontRendererObj.getStringWidth(s) / 2, 6, 4210752);
+        fontRendererObj.drawString(I18n.format("container.inventory"), 8, ySize - 96 + 2, 4210752);
+    }
+}
+
