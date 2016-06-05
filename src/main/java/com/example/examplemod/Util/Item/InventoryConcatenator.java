@@ -1,9 +1,5 @@
 package com.example.examplemod.Util.Item;
 
-/**
- * Created by stefan on 27-4-2016.
- */
-
 import com.example.examplemod.Util.LogHelper;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;

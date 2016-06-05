@@ -7,9 +7,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 
-/**
- * Created by stefan on 28-4-2016.
- */
+
 public class BlockArcane extends BlockMain {
     public BlockArcane(){
         this.setBlockName("lol");
@@ -22,7 +20,9 @@ public class BlockArcane extends BlockMain {
 
     @Override
     public boolean onBlockActivated(World world, int X, int Y, int Z, EntityPlayer player, int p_149727_6_, float hitX, float hitY, float hiyZ) {
-        player.openGui(thaumicLogisticMod.INSTANCE, GuiHandler.GuiIds.ArcaneId.ordinal(),world,X,Y,Z);
+        if (!world.isRemote) {
+            player.openGui(thaumicLogisticMod.INSTANCE, GuiHandler.GuiIds.ArcaneId.ordinal(), world, X, Y, Z);
+        }
         return true;
     }
 }

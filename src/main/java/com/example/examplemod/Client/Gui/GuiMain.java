@@ -7,9 +7,6 @@ import net.minecraft.inventory.Container;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.util.ResourceLocation;
 
-/**
- * Created by stefan on 28-4-2016.
- */
 public abstract class GuiMain extends GuiContainer {
 
     private final ResourceLocation guiTexture;

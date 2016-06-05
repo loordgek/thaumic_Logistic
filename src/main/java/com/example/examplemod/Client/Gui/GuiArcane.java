@@ -7,9 +7,6 @@ import net.minecraft.entity.player.InventoryPlayer;
 
 import java.util.List;
 
-/**
- * Created by stefan on 28-4-2016.
- */
 public class GuiArcane extends GuiMain {
     TileArcane te;
     public GuiArcane(InventoryPlayer playerInventory, TileArcane te){

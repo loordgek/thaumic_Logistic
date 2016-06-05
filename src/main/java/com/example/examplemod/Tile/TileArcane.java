@@ -1,5 +1,6 @@
 package com.example.examplemod.Tile;
 
+import com.example.examplemod.Util.Item.IInventoryOwner;
 import com.example.examplemod.Util.Item.InventoryConcatenator;
 import com.example.examplemod.Util.Item.InventorySimple;
 import com.example.examplemod.Util.LogHelper;
@@ -12,14 +13,11 @@ import net.minecraft.tileentity.TileEntity;
 import thaumcraft.api.crafting.IArcaneRecipe;
 import thaumcraft.common.items.wands.ItemWandCasting;
 
-/**
- * Created by stefan on 26-4-2016.
- */
-public class TileArcane extends TileEntity implements IInventory {
-    private InventorySimple result = new InventorySimple(1,1,"result");
-    private InventorySimple wandinv = new InventorySimple(1,1,"wand");
-    private InventorySimple maininv = new InventorySimple(64,21,"maininv");
-    private InventorySimple matrix = new InventorySimple(1,9,"matrix");
+public class TileArcane extends TileEntity implements IInventory, IInventoryOwner {
+    private InventorySimple result = new InventorySimple(1,1,"result", this);
+    private InventorySimple wandinv = new InventorySimple(1,1,"wand", this);
+    private InventorySimple maininv = new InventorySimple(64,18,"maininv", this);
+    private InventorySimple matrix = new InventorySimple(1,9,"matrix", this);
 
 
     private IInventory inv = InventoryConcatenator.make().add(maininv).add(matrix).add(result);
@@ -46,17 +44,18 @@ public class TileArcane extends TileEntity implements IInventory {
     @Override
     public void readFromNBT(NBTTagCompound tag) {
         super.readFromNBT(tag);
-        maininv.readFromNBT(tag);
-        wandinv.readFromNBT(tag);
-        matrix.readFromNBT(tag);
+        maininv.readFromNBT(tag, maininv.getInventoryName());
+        wandinv.readFromNBT(tag, wandinv.getInventoryName());
+        matrix.readFromNBT(tag, matrix.getInventoryName());
     }
 
     @Override
     public void writeToNBT(NBTTagCompound tag) {
         super.writeToNBT(tag);
-        maininv.writeToNBT(tag);
-        wandinv.writeToNBT(tag);
-        matrix.writeToNBT(tag);
+        maininv.writeToNBT(tag, maininv.getInventoryName());
+        wandinv.writeToNBT(tag, wandinv.getInventoryName());
+        matrix.writeToNBT(tag, matrix.getInventoryName());
+        LogHelper.info(tag);
     }
 
     @Override
@@ -121,5 +120,15 @@ public class TileArcane extends TileEntity implements IInventory {
     @Override
     public boolean isItemValidForSlot(int slot, ItemStack stack) {
         return true;
+    }
+
+    @Override
+    public void onInventoryChanged(IInventory inventory) {
+        markDirty();
+    }
+
+    @Override
+    public void markDirty() {
+        super.markDirty();
     }
 }

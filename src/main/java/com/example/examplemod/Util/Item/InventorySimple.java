@@ -7,38 +7,38 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 
-/**
- * Created by stefan on 26-4-2016.
- */
 public class InventorySimple implements IInventory{
     private ItemStack[] Stacks;
     private int StackSize;
     private int InvSize;
     private String name;
+    private IInventoryOwner owner;
 
 
 
-    public InventorySimple(int Stacksize, int invSize, String name) {
+    public InventorySimple(int Stacksize, int invSize, String name, IInventoryOwner owner) {
         this.StackSize = Stacksize;
         this.InvSize = invSize;
         this.name = name;
         this.Stacks = new ItemStack[invSize];
+        this.owner = owner;
     }
 
-    public void readFromNBT(NBTTagCompound tag) {
+    public void readFromNBT(NBTTagCompound tag, String key) {
         Stacks = new ItemStack[getSizeInventory()];
-        NBTTagList camoStackTag = tag.getTagList("camoStacks", 10);
+        NBTTagList camoStackTag = tag.getTagList(key, 10);
 
         for(int i = 0; i < camoStackTag.tagCount(); i++) {
             NBTTagCompound t = camoStackTag.getCompoundTagAt(i);
             int index = t.getByte("index");
             if(index >= 0 && index < Stacks.length) {
                     Stacks[index] = ItemStack.loadItemStackFromNBT(t);
+                markDirty();
             }
         }
     }
 
-    public void writeToNBT(NBTTagCompound tag) {
+    public void writeToNBT(NBTTagCompound tag, String key) {
         NBTTagList camoStackTag = new NBTTagList();
         for(int i = 0; i < Stacks.length; i++) {
             ItemStack stack = Stacks[i];
@@ -49,7 +49,9 @@ public class InventorySimple implements IInventory{
                 camoStackTag.appendTag(t);
             }
         }
-        tag.setTag("camoStacks", camoStackTag);
+        tag.setTag(key, camoStackTag);
+        LogHelper.info(camoStackTag);
+        markDirty();
     }
 
     @Override
@@ -103,6 +105,15 @@ public class InventorySimple implements IInventory{
 
     @Override
     public void setInventorySlotContents(int slot, ItemStack stack) {
+        if (slot >= Stacks.length) {
+            return;
+        }
+        Stacks[slot] = stack;
+
+        if (stack != null && stack.stackSize > this.getInventoryStackLimit()) {
+            stack.stackSize = this.getInventoryStackLimit();
+        }
+        markDirty();
 
     }
 
@@ -123,7 +134,7 @@ public class InventorySimple implements IInventory{
 
     @Override
     public void markDirty() {
-
+        owner.onInventoryChanged(this);
     }
 
     @Override
