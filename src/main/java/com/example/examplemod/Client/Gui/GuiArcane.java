@@ -10,7 +10,7 @@ import java.util.List;
 public class GuiArcane extends GuiMain {
     TileArcane te;
     public GuiArcane(InventoryPlayer playerInventory, TileArcane te){
-        super(new ContainerArcane(playerInventory, te), "camoMine", te);
+        super(new ContainerArcane(playerInventory, te), "Guiarcane", te);
         this.te = te;
     }
 

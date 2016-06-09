@@ -38,9 +38,9 @@ public final class InventoryConcatenator implements IInventory {
 
     @Override
     public ItemStack getStackInSlot(int slot) {
-        if (slot >invMap.get(slot).getSizeInventory()){
-            String name = "Concatenator";
-            LogHelper.error(slot +" "+ name);
+        if (slot > invMap.get(slot).getSizeInventory()){
+//            String name = "Concatenator";
+//            LogHelper.error(slot +" "+ name);
             return null;}
         return invMap.get(slot).getStackInSlot(slotMap.get(slot));
     }

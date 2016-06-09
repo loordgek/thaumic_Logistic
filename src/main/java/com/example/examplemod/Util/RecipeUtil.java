@@ -8,9 +8,6 @@ import thaumcraft.api.aspects.AspectList;
 import thaumcraft.api.crafting.IArcaneRecipe;
 import thaumcraft.common.tiles.TileMagicWorkbench;
 
-/**
- * Created by stefan on 26-4-2016.
- */
 public class RecipeUtil {
     /**
      * Singleton.

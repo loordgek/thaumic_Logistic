@@ -3,7 +3,9 @@ package com.example.examplemod.Block;
 import com.example.examplemod.GuiHandler;
 import com.example.examplemod.Tile.TileArcane;
 import com.example.examplemod.thaumicLogisticMod;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 
@@ -24,6 +26,16 @@ public class BlockArcane extends BlockMain {
             player.openGui(thaumicLogisticMod.INSTANCE, GuiHandler.GuiIds.ArcaneId.ordinal(), world, X, Y, Z);
         }
         return true;
+    }
+
+    @Override
+    public void onBlockPlacedBy(World world, int x, int y, int z, EntityLivingBase livingBase, ItemStack stack) {
+        TileEntity tileEntity = world.getTileEntity(x,y,z);
+        if (tileEntity instanceof  TileArcane){
+            if (livingBase instanceof EntityPlayer){
+            ((TileArcane)tileEntity).PlacedBy((EntityPlayer) livingBase);
+        }
+        }
     }
 }
 
