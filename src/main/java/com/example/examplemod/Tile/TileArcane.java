@@ -5,6 +5,7 @@ import com.example.examplemod.Util.Item.InventoryConcatenator;
 import com.example.examplemod.Util.Item.InventorySimple;
 import com.example.examplemod.Util.LogHelper;
 import com.example.examplemod.Util.PlayerIdentifier;
+import com.example.examplemod.Util.PlayerUtil;
 import com.example.examplemod.Util.RecipeUtil;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
@@ -23,11 +24,14 @@ public class TileArcane extends TileEntity implements IInventory, IInventoryOwne
     public EntityPlayer player = null;
     private int Timer = 0;
     private boolean firsttick = true;
+    private String Username;
+    private boolean hasplayer = false;
 
 
     private IInventory inv = InventoryConcatenator.make().add(maininv).add(matrix).add(result);
 
     public TileArcane() {
+
     }
     private void ticktimer(){
         if (Timer == 0){
@@ -38,9 +42,18 @@ public class TileArcane extends TileEntity implements IInventory, IInventoryOwne
     }
 
     private void tick(){
-//        if (result.getStackInSlot(0) == null) SetResult();
-        if (placedBy != null) {
+        if (placedBy != null){
             LogHelper.info(placedBy.getUsername());
+        }
+        LogHelper.info(Username);
+//        if (result.getStackInSlot(0) == null) SetResult();
+
+        if (!hasplayer){
+            if (hasWorldObj()){
+                LogHelper.info("setplayer");
+                player = PlayerUtil.findplayer(worldObj, Username);
+                hasplayer = true;
+            }
         }
     }
 
@@ -52,8 +65,7 @@ public class TileArcane extends TileEntity implements IInventory, IInventoryOwne
         result.setInventorySlotContents(0,arcaneRecipe.getRecipeOutput());
     }
     public void PlacedBy(EntityPlayer player){
-        this.placedBy = PlayerIdentifier.get(player);
-        this.player = player;
+        Username = player.getDisplayName();
     }
 
     @Override
@@ -66,12 +78,10 @@ public class TileArcane extends TileEntity implements IInventory, IInventoryOwne
             tick1time();
             firsttick = false;
         }
-
     }
     private void tick1time() {
-        if (placedBy != null) {
-            this.player = worldObj.getPlayerEntityByName(placedBy.getUsername());
-        }
+//        if (placedBy != null) {
+//            this.player = worldObj.getPlayerEntityByName(placedBy.getUsername());
     }
 
     @Override
@@ -80,11 +90,7 @@ public class TileArcane extends TileEntity implements IInventory, IInventoryOwne
         if (tag.hasKey("placedBy")) {
             String name = tag.getString("placedBy");
             placedBy = PlayerIdentifier.convertFromUsername(name);
-        } else {
-            placedBy = PlayerIdentifier.readFromNBT(tag, "placedBy");
-        }
-        String player = tag.getString("player");
-        this.player = worldObj.getPlayerEntityByName(player);
+        } else {placedBy = PlayerIdentifier.readFromNBT(tag, "placedBy");}
         maininv.readFromNBT(tag, maininv.getInventoryName());
         wandinv.readFromNBT(tag, wandinv.getInventoryName());
         matrix.readFromNBT(tag, matrix.getInventoryName());
@@ -99,7 +105,7 @@ public class TileArcane extends TileEntity implements IInventory, IInventoryOwne
         maininv.writeToNBT(tag, maininv.getInventoryName());
         wandinv.writeToNBT(tag, wandinv.getInventoryName());
         matrix.writeToNBT(tag, matrix.getInventoryName());
-        LogHelper.info(tag);
+
     }
 
     @Override
