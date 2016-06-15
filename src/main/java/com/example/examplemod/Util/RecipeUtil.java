@@ -52,7 +52,7 @@ public class RecipeUtil {
      * @param player
      * @return
      */
-    public IArcaneRecipe findMatchingArcaneResult(	final IInventory sourceInventory, final int firstSlotIndex, final int gridSize, final EntityPlayer player )
+    public IArcaneRecipe findMatchingArcaneResult( IInventory sourceInventory, int firstSlotIndex, int gridSize, EntityPlayer player )
     {
         // Create a the workbench
         TileMagicWorkbench workbenchTile = this.createBridgeInventory( sourceInventory, firstSlotIndex, gridSize );

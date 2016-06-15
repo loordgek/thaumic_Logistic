@@ -4,13 +4,14 @@ import com.example.examplemod.Util.Item.IInventoryOwner;
 import com.example.examplemod.Util.Item.InventoryConcatenator;
 import com.example.examplemod.Util.Item.InventorySimple;
 import com.example.examplemod.Util.LogHelper;
-import com.example.examplemod.Util.PlayerIdentifier;
-import com.example.examplemod.Util.PlayerUtil;
 import com.example.examplemod.Util.RecipeUtil;
+import com.mojang.authlib.GameProfile;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTUtil;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.TileEntity;
 import thaumcraft.api.crafting.IArcaneRecipe;
 import thaumcraft.common.items.wands.ItemWandCasting;
@@ -20,77 +21,59 @@ public class TileArcane extends TileEntity implements IInventory, IInventoryOwne
     public InventorySimple wandinv = new InventorySimple(1,1,"wand", this);
     public InventorySimple maininv = new InventorySimple(64,18,"maininv", this);
     public InventorySimple matrix = new InventorySimple(1,9,"matrix", this);
-    public PlayerIdentifier placedBy = null;
-    public EntityPlayer player = null;
-    private int Timer = 0;
-    private boolean firsttick = true;
-    private String Username;
-    private boolean hasplayer = false;
-
+    private GameProfile playerprofile;
+    private final String TAG_PLAYER = "TRANSMEED_PLAYER";
+    private int timer = 0;
 
     private IInventory inv = InventoryConcatenator.make().add(maininv).add(matrix).add(result);
 
-    public TileArcane() {
+    public TileArcane() {}
 
-    }
-    private void ticktimer(){
-        if (Timer == 0){
-            Timer = 20;
-            tick();
+    public EntityPlayer getPlayer() {
+        if (playerprofile != null) {
+            return MinecraftServer.getServer().getConfigurationManager().func_152612_a(playerprofile.getName());
         }
-        Timer--;
-    }
-
-    private void tick(){
-        if (placedBy != null){
-            LogHelper.info(placedBy.getUsername());
-        }
-        LogHelper.info(Username);
-//        if (result.getStackInSlot(0) == null) SetResult();
-
-        if (!hasplayer){
-            if (hasWorldObj()){
-                LogHelper.info("setplayer");
-                player = PlayerUtil.findplayer(worldObj, Username);
-                hasplayer = true;
-            }
-        }
+        return null;
     }
 
     private void SetResult(){
+        if (getPlayer() == null) return;
         if (wandinv.getStackInSlot(0) == null) return;
         ItemWandCasting itemWandCasting = (ItemWandCasting)wandinv.getStackInSlot(0).getItem();
-        IArcaneRecipe arcaneRecipe = RecipeUtil.INSTANCE.findMatchingArcaneResult(matrix,0,9,player);
-        if (itemWandCasting.consumeAllVisCrafting(wandinv.getStackInSlot(0), player, arcaneRecipe.getAspects(),false)) return;
+        IArcaneRecipe arcaneRecipe = RecipeUtil.INSTANCE.findMatchingArcaneResult(matrix,0,9,getPlayer());
+        if (arcaneRecipe == null) return;
+        LogHelper.info(arcaneRecipe.getRecipeOutput());
+        if (itemWandCasting.consumeAllVisCrafting(wandinv.getStackInSlot(0), getPlayer(), arcaneRecipe.getAspects(),false)) return;
         result.setInventorySlotContents(0,arcaneRecipe.getRecipeOutput());
     }
     public void PlacedBy(EntityPlayer player){
-        Username = player.getDisplayName();
+        playerprofile = player.getGameProfile();
     }
 
     @Override
     public void updateEntity() {
         super.updateEntity();
-        if(worldObj.isRemote){
-            ticktimer();
-        }
-        if (firsttick){
-            tick1time();
-            firsttick = false;
+        if (!worldObj.isRemote){
+            if (timer == 0){
+                timer = 20;
+                tick();
+            }
+            timer--;
         }
     }
-    private void tick1time() {
-//        if (placedBy != null) {
-//            this.player = worldObj.getPlayerEntityByName(placedBy.getUsername());
+    public void tick(){
+        SetResult();
+        if (getPlayer() != null){
+            LogHelper.info(getPlayer());
+       }
     }
 
     @Override
     public void readFromNBT(NBTTagCompound tag) {
         super.readFromNBT(tag);
-        if (tag.hasKey("placedBy")) {
-            String name = tag.getString("placedBy");
-            placedBy = PlayerIdentifier.convertFromUsername(name);
-        } else {placedBy = PlayerIdentifier.readFromNBT(tag, "placedBy");}
+        if(tag.hasKey(TAG_PLAYER)){
+            playerprofile = NBTUtil.func_152459_a(tag.getCompoundTag(TAG_PLAYER));
+        }
         maininv.readFromNBT(tag, maininv.getInventoryName());
         wandinv.readFromNBT(tag, wandinv.getInventoryName());
         matrix.readFromNBT(tag, matrix.getInventoryName());
@@ -99,13 +82,14 @@ public class TileArcane extends TileEntity implements IInventory, IInventoryOwne
     @Override
     public void writeToNBT(NBTTagCompound tag) {
         super.writeToNBT(tag);
-        if (placedBy != null) {
-            placedBy.writeToNBT(tag, "placedBy");
+        if (this.playerprofile != null) {
+            NBTTagCompound nbt = new NBTTagCompound();
+            NBTUtil.func_152460_a(nbt, playerprofile);
+            tag.setTag(TAG_PLAYER, nbt);
         }
         maininv.writeToNBT(tag, maininv.getInventoryName());
         wandinv.writeToNBT(tag, wandinv.getInventoryName());
         matrix.writeToNBT(tag, matrix.getInventoryName());
-
     }
 
     @Override

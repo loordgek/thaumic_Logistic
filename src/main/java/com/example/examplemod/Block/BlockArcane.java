@@ -30,11 +30,13 @@ public class BlockArcane extends BlockMain {
 
     @Override
     public void onBlockPlacedBy(World world, int x, int y, int z, EntityLivingBase livingBase, ItemStack stack) {
-        TileEntity tileEntity = world.getTileEntity(x,y,z);
-        if (tileEntity instanceof  TileArcane){
-            if (livingBase instanceof EntityPlayer){
-            ((TileArcane)tileEntity).PlacedBy((EntityPlayer) livingBase);
-        }
+        if (!world.isRemote){
+            TileEntity tileEntity = world.getTileEntity(x,y,z);
+            if (tileEntity instanceof  TileArcane){
+                if (livingBase instanceof EntityPlayer){
+                    ((TileArcane)tileEntity).PlacedBy((EntityPlayer) livingBase);
+                }
+            }
         }
     }
 }
