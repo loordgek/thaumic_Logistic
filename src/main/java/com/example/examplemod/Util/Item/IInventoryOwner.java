@@ -1,4 +1,4 @@
-package com.example.examplemod.Util.Item;
+package com.example.examplemod.util.item;
 
 import net.minecraft.inventory.IInventory;
 

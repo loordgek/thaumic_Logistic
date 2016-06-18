@@ -1,5 +1,6 @@
 package com.example.examplemod.Client.Gui;
 
+import com.example.examplemod.reference.Reference;
 import com.example.examplemod.thaumicLogisticMod;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.resources.I18n;
@@ -14,7 +15,7 @@ public abstract class GuiMain extends GuiContainer {
 
     public GuiMain(Container container, String guiTextureName, IInventory inventory) {
         super(container);
-        guiTexture = new ResourceLocation(thaumicLogisticMod.MODID.toLowerCase() + ":textures/gui/" + guiTextureName + ".png");
+        guiTexture = new ResourceLocation(Reference.MOD.MOD_ID.toLowerCase() + ":textures/gui/" + guiTextureName + ".png");
         this.inventory = inventory;
     }
 

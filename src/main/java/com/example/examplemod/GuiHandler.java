@@ -1,8 +1,8 @@
 package com.example.examplemod;
 
 import com.example.examplemod.Client.Gui.GuiArcane;
-import com.example.examplemod.Inventroy.Container.ContainerArcane;
-import com.example.examplemod.Tile.TileArcane;
+import com.example.examplemod.inventroy.Container.ContainerArcane;
+import com.example.examplemod.tile.TileArcane;
 import cpw.mods.fml.common.network.IGuiHandler;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;

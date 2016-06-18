@@ -1,6 +1,6 @@
-package com.example.examplemod.Inventroy.Container;
+package com.example.examplemod.inventroy.Container;
 
-import com.example.examplemod.Inventroy.Slot.IPhantomSlot;
+import com.example.examplemod.inventroy.Slot.IPhantomSlot;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;

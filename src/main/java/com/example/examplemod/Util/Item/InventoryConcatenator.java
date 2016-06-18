@@ -1,6 +1,5 @@
-package com.example.examplemod.Util.Item;
+package com.example.examplemod.util.item;
 
-import com.example.examplemod.Util.LogHelper;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;

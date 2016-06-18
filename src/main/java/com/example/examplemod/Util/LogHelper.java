@@ -1,6 +1,6 @@
-package com.example.examplemod.Util;
+package com.example.examplemod.util;
 
-import com.example.examplemod.thaumicLogisticMod;
+import com.example.examplemod.reference.Reference;
 import cpw.mods.fml.common.FMLLog;
 import org.apache.logging.log4j.Level;
 
@@ -8,7 +8,7 @@ public class LogHelper
 {
     public static void log(Level logLevel, Object object)
     {
-        FMLLog.log(thaumicLogisticMod.MODID, logLevel, String.valueOf(object));
+        FMLLog.log(Reference.MOD.MOD_ID, logLevel, String.valueOf(object));
     }
 
     public static void all(Object object)

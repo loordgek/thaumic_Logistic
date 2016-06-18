@@ -1,124 +1,42 @@
-package com.example.examplemod.Util;
+package com.example.examplemod.util;
 
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.IInventory;
+import cpw.mods.fml.common.registry.GameRegistry;
 import net.minecraft.item.ItemStack;
-import thaumcraft.api.ThaumcraftApi;
-import thaumcraft.api.aspects.AspectList;
-import thaumcraft.api.crafting.IArcaneRecipe;
-import thaumcraft.common.tiles.TileMagicWorkbench;
+import net.minecraftforge.oredict.OreDictionary;
 
 public class RecipeUtil {
-    /**
-     * Singleton.
-     */
-    public static final RecipeUtil INSTANCE = new RecipeUtil();
-
-    /**
-     * Private constructor.
-     */
-    private RecipeUtil() {}
-
-    /**
-     * Creates a workbench with its crafting grid set to match the source
-     * inventory.
-     *
-     * @param sourceInventory
-     * @param firstSlotIndex
-     * @param gridSize
-     * @return
-     */
-    private TileMagicWorkbench createBridgeInventory(final IInventory sourceInventory, final int firstSlotIndex, final int gridSize )
-    {
-        // Create a new workbench tile
-        TileMagicWorkbench workbenchTile = new TileMagicWorkbench();
-
-        // Load the workbench inventory
-        for( int slotIndex = 0; slotIndex < gridSize; slotIndex++ )
-        {
-            // Set the slot
-            workbenchTile.setInventorySlotContentsSoftly( slotIndex, sourceInventory.getStackInSlot( slotIndex + firstSlotIndex ) );
+    public static ItemStack parseStringAsItemStack(String str, boolean allowWildcard){
+        str = str.trim();
+        int count = 1;
+        int meta;
+        if(allowWildcard){
+            meta = OreDictionary.WILDCARD_VALUE;
+        } else {
+            meta = 0;
         }
-
-        return workbenchTile;
-    }
-
-    /**
-     * Searches for a matching arcane crafting recipe
-     *
-     * @param sourceInventory
-     * @param firstSlotIndex
-     * @param gridSize
-     * @param player
-     * @return
-     */
-    public IArcaneRecipe findMatchingArcaneResult( IInventory sourceInventory, int firstSlotIndex, int gridSize, EntityPlayer player )
-    {
-        // Create a the workbench
-        TileMagicWorkbench workbenchTile = this.createBridgeInventory( sourceInventory, firstSlotIndex, gridSize );
-
-        IArcaneRecipe arcaneRecipe = null;
-
-        // Loop through all arcane crafting recipes
-        for( Object currentRecipe : ThaumcraftApi.getCraftingRecipes() )
-        {
-            // Is the current recipe an arcane one?
-            if( currentRecipe instanceof IArcaneRecipe )
-            {
-                // Does the recipe have a match?
-                if( ( (IArcaneRecipe)currentRecipe ).matches( workbenchTile, player.worldObj, player ) )
-                {
-                    // Found a match, stop searching
-                    arcaneRecipe = (IArcaneRecipe)currentRecipe;
-
-                    break;
-                }
-            }
+        int nameStart = 0;
+        int nameEnd = str.length();
+        if(str.contains("*")){
+            count = Integer.parseInt(str.substring(0,str.indexOf("*")).trim());
+            nameStart = str.indexOf("*")+1;
         }
-
-        // Return the result
-        return arcaneRecipe;
-    }
-
-    /**
-     * Gets the base aspect cost of this recipe. Can return null.
-     *
-     * @param sourceInventory
-     * @param firstSlotIndex
-     * @param gridSize
-     * @param recipe
-     * @return
-     */
-    public AspectList getRecipeAspectCost(final IInventory sourceInventory, final int firstSlotIndex, final int gridSize, final IArcaneRecipe recipe )
-    {
-        // Ensure the recipe is valid
-        if( recipe == null )
-        {
+        if(str.contains("#")){
+            meta = Integer.parseInt(str.substring(str.indexOf("#")+1,str.length()).trim());
+            nameEnd = str.indexOf("#");
+        }
+        String id = str.substring(nameStart,nameEnd).trim();
+        String mod = id.substring(0,id.indexOf(":")).trim();
+        String name = id.substring(id.indexOf(":")+1,id.length()).trim();
+        if(GameRegistry.findBlock(mod, name) != null){
+            // is a block
+            return new ItemStack(GameRegistry.findBlock(mod, name),count,meta);
+        } else if(GameRegistry.findItem(mod, name) != null){
+            // is an item
+            return new ItemStack(GameRegistry.findItem(mod, name),count,meta);
+        } else {
+            // item not found
+            LogHelper.warn("Failed to find item or block for ID '"+id+"'");
             return null;
         }
-
-        return recipe.getAspects( this.createBridgeInventory( sourceInventory, firstSlotIndex, gridSize ) );
     }
-
-    /**
-     * Gets the item that results from this recipe. Can be null.
-     *
-     * @param sourceInventory
-     * @param firstSlotIndex
-     * @param gridSize
-     * @param recipe
-     * @return
-     */
-    public ItemStack getRecipeOutput(final IInventory sourceInventory, final int firstSlotIndex, final int gridSize, final IArcaneRecipe recipe )
-    {
-        // Ensure the recipe is valid
-        if( recipe == null )
-        {
-            return null;
-        }
-
-        return recipe.getCraftingResult( this.createBridgeInventory( sourceInventory, firstSlotIndex, gridSize ) );
-    }
-
 }
-

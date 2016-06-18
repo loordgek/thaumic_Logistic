@@ -1,4 +1,4 @@
-package com.example.examplemod.Inventroy.Slot;
+package com.example.examplemod.inventroy.Slot;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;

@@ -1,10 +1,11 @@
-package com.example.examplemod.Tile;
+package com.example.examplemod.tile;
 
-import com.example.examplemod.Util.Item.IInventoryOwner;
-import com.example.examplemod.Util.Item.InventoryConcatenator;
-import com.example.examplemod.Util.Item.InventorySimple;
-import com.example.examplemod.Util.LogHelper;
-import com.example.examplemod.Util.RecipeUtil;
+import com.example.examplemod.util.item.IInventoryOwner;
+import com.example.examplemod.util.item.IinventoryUtil;
+import com.example.examplemod.util.item.InventoryConcatenator;
+import com.example.examplemod.util.item.InventorySimple;
+import com.example.examplemod.util.LogHelper;
+import com.example.examplemod.util.RecipeUtilTH;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
@@ -13,11 +14,13 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTUtil;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.TileEntity;
+import thaumcraft.api.aspects.Aspect;
+import thaumcraft.api.aspects.AspectList;
 import thaumcraft.api.crafting.IArcaneRecipe;
 import thaumcraft.common.items.wands.ItemWandCasting;
 
 public class TileArcane extends TileEntity implements IInventory, IInventoryOwner {
-    public InventorySimple result = new InventorySimple(1,1,"result", this);
+    public InventorySimple result = new InventorySimple(64,1,"result", this);
     public InventorySimple wandinv = new InventorySimple(1,1,"wand", this);
     public InventorySimple maininv = new InventorySimple(64,18,"maininv", this);
     public InventorySimple matrix = new InventorySimple(1,9,"matrix", this);
@@ -39,16 +42,49 @@ public class TileArcane extends TileEntity implements IInventory, IInventoryOwne
     private void SetResult(){
         if (getPlayer() == null) return;
         if (wandinv.getStackInSlot(0) == null) return;
+        if (result.getStackInSlot(0) != null) return;
         ItemWandCasting itemWandCasting = (ItemWandCasting)wandinv.getStackInSlot(0).getItem();
-        IArcaneRecipe arcaneRecipe = RecipeUtil.INSTANCE.findMatchingArcaneResult(matrix,0,9,getPlayer());
+        IArcaneRecipe arcaneRecipe = RecipeUtilTH.INSTANCE.findMatchingArcaneResult(matrix,0,9,getPlayer());
         if (arcaneRecipe == null) return;
-        LogHelper.info(arcaneRecipe.getRecipeOutput());
-        if (itemWandCasting.consumeAllVisCrafting(wandinv.getStackInSlot(0), getPlayer(), arcaneRecipe.getAspects(),false)) return;
-        result.setInventorySlotContents(0,arcaneRecipe.getRecipeOutput());
+        if (!hasEnoughVisForCraft(arcaneRecipe,itemWandCasting.getAllVis(wandinv.getStackInSlot(0)))) return;
+
+        if (IinventoryUtil.containsSets(IinventoryUtil.getStacks(matrix),IinventoryUtil.getStacks(maininv),false,false)>0)
+        {
+            if (!itemWandCasting.consumeAllVisCrafting(wandinv.getStackInSlot(0), getPlayer(), arcaneRecipe.getAspects(),true)) return;
+            IinventoryUtil.removeSets(maininv,1,IinventoryUtil.getStacks(matrix),getPlayer(),true,false,false);
+            ItemStack stackoutput = arcaneRecipe.getRecipeOutput();
+            stackoutput.stackSize = arcaneRecipe.getRecipeOutput().stackSize;
+            result.setInventorySlotContents(0,arcaneRecipe.getCraftingResult(matrix));
+        }
     }
     public void PlacedBy(EntityPlayer player){
         playerprofile = player.getGameProfile();
     }
+
+    private boolean hasEnoughVisForCraft(IArcaneRecipe arcaneRecipe, AspectList aspectListwand) {
+        // Get the required aspects
+        AspectList aspectList = arcaneRecipe.getAspects();
+        Aspect[] requiredAspects = aspectList.getAspects();
+
+        // Check each aspect required by the pattern
+        for( Aspect aspect : requiredAspects )
+        {
+            // Calculate the required amount
+            int requiredAmount = this.getRequiredAmountForAspect(aspect,aspectList);
+
+            // Is there not enough?
+            if( aspectListwand.getAmount(aspect) < requiredAmount)
+            {
+                return false;
+            }
+        }
+        // Has enough of all aspects
+        return true;
+    }
+    private int getRequiredAmountForAspect(Aspect aspect ,AspectList aspectList) {
+        return aspectList.getAmount(aspect);
+    }
+
 
     @Override
     public void updateEntity() {
@@ -63,9 +99,6 @@ public class TileArcane extends TileEntity implements IInventory, IInventoryOwne
     }
     public void tick(){
         SetResult();
-        if (getPlayer() != null){
-            LogHelper.info(getPlayer());
-       }
     }
 
     @Override

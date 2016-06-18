@@ -1,4 +1,4 @@
-package com.example.examplemod.Util.Item;
+package com.example.examplemod.util.item;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
@@ -58,7 +58,11 @@ public class IinventoryUtil {
     private static ItemStack removeStack(IInventory inventory, ItemStack stackToRemove, EntityPlayer player, boolean stowContainer, boolean oreDictionary) {
         for (int j = 0; j < inventory.getSizeInventory(); j++) {
             ItemStack stackInSlot = inventory.getStackInSlot(j);
-            ItemStack removed = inventory.decrStackSize(j, stackToRemove.stackSize);
+            if (stackInSlot == null) continue;
+            int index = findstackininv(stackToRemove, inventory);
+            if (index == -1) return null;
+
+            ItemStack removed = inventory.decrStackSize(index, stackToRemove.stackSize);
             stackToRemove.stackSize -= removed.stackSize;
 
             if (stackToRemove.stackSize == 0) {
@@ -69,6 +73,17 @@ public class IinventoryUtil {
         }
         return null;
     }
+
+    public static int findstackininv(ItemStack stack, IInventory inventory){
+        for (int j = 0; j < inventory.getSizeInventory(); j++){
+            if (inventory.getStackInSlot(j) == null) continue;
+            if (inventory.getStackInSlot(j).getItem()  == stack.getItem() && inventory.getStackInSlot(j).getItemDamage()  == stack.getItemDamage()){
+                return j;
+            }
+        }
+        return -1;
+    }
+
     public static ItemStack[] condenseStacks(ItemStack[] stacks) {
     List<ItemStack> condensed = new ArrayList<ItemStack>();
 
@@ -97,6 +112,7 @@ public class IinventoryUtil {
 
     return condensed.toArray(new ItemStack[condensed.size()]);
     }
+
     public static int containsSets(ItemStack[] set, ItemStack[] stock, boolean oreDictionary, boolean craftingTools) {
         int totalSets = 0;
 
@@ -124,6 +140,7 @@ public class IinventoryUtil {
 
         return totalSets;
     }
+
     public static boolean IsItemStackEqual(ItemStack stack1,ItemStack stack2){
         if (stack1 == null || stack2 == null) return false;
         if (!stack1.isItemEqual(stack2))return false;

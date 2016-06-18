@@ -1,4 +1,4 @@
-package com.example.examplemod.Inventroy.Slot;
+package com.example.examplemod.inventroy.Slot;
 
 /**
  * This class is copied from the BuildCraft code, which can be found here: https://github.com/BuildCraft/BuildCraft

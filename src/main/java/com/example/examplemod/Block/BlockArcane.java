@@ -1,7 +1,7 @@
-package com.example.examplemod.Block;
+package com.example.examplemod.block;
 
 import com.example.examplemod.GuiHandler;
-import com.example.examplemod.Tile.TileArcane;
+import com.example.examplemod.tile.TileArcane;
 import com.example.examplemod.thaumicLogisticMod;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
@@ -12,7 +12,8 @@ import net.minecraft.world.World;
 
 public class BlockArcane extends BlockMain {
     public BlockArcane(){
-        this.setBlockName("lol");
+        this.setBlockName("arcane");
+        this.setBlockTextureName("arcane");
     }
 
     @Override

@@ -1,17 +1,16 @@
 package com.example.examplemod.Client.Gui;
 
-import com.example.examplemod.Inventroy.Container.ContainerArcane;
-import com.example.examplemod.Tile.TileArcane;
-import net.minecraft.client.gui.FontRenderer;
+import com.example.examplemod.inventroy.Container.ContainerArcane;
+import com.example.examplemod.tile.TileArcane;
 import net.minecraft.entity.player.InventoryPlayer;
 
-import java.util.List;
-
 public class GuiArcane extends GuiMain {
-    TileArcane te;
+    public TileArcane te;
     public GuiArcane(InventoryPlayer playerInventory, TileArcane te){
         super(new ContainerArcane(playerInventory, te), "Guiarcane", te);
         this.te = te;
+    //    this.xSize = 200;
+        this.ySize = 220;
     }
 
     @Override
